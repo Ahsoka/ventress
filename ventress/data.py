@@ -59,7 +59,7 @@ class SurvivrData:
                     match = Case.findall(key)
                     if match:
                         setattr(mode,
-                                f"{camel.match(key).group(0)}_{'_'.join(map(str.lower, match))}",
+                                f"{'_'.join([camel.match(key).group(0), *map(str.lower, match)])}",
                                 mode[key])
 
         return self._json
