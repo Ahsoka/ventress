@@ -16,9 +16,9 @@ class JSONToClass:
         async with aiohttp.ClientSession() as session:
             async with session.post(self.url,
                                     json=self.payload,
-                                    params=self.params if hasattr(self, 'params') else {}) as user:
-                self._request = user
-                self._json = await user.json()
+                                    params=self.params if hasattr(self, 'params') else {}) as request:
+                self._request = request
+                self._json = await request.json()
         if self._json is None:
             self._raise_error_json_is_none()
 
