@@ -1,9 +1,12 @@
 import re
 import aiohttp
 
-class SurvivrData:
-    class UserDoesNotExist(Exception): pass
+from .utils import JSONToClass
 
+class UserDoesNotExist(Exception): pass
+
+class SurvivrData(JSONToClass):
+    url = 'https://surviv.io/api/user_stats'
     valid_intevals = ['all', 'alltime', 'weekly', 'daily']
     valid_gamemodes = range(-1, 19)
 
@@ -21,31 +24,10 @@ class SurvivrData:
             'mapIdFilter': self.gamemode
         }
 
-    def __await__(self):
-        return self._async_init().__await__()
-
-    async def _async_init(self):
-        await self.json
-        return self
-
-    @property
-    async def json(self):
-        class ModesList(list): pass
-
-        async with aiohttp.ClientSession() as session:
-            async with session.post('https://surviv.io/api/user_stats', json=self.payload) as user:
-                self._json = await user.json()
-        if self._json is None:
-            raise self.UserDoesNotExist(f'User {self._username!r} does not exist!')
-
-        decimal = re.compile(r'\d+\.\d+')
-        for key in self._json:
-            if decimal.fullmatch(str(self._json[key])):
-                setattr(self, key, float(self._json[key]))
-            else:
-                setattr(self, key, self._json[key])
-
+    async def _setattrs(self):
+        await super()._setattrs()
         if hasattr(self, 'modes') and len(self.modes) >= 1:
+            decimal = re.compile(r'\d+\.\d+')
             class ModeDict(dict): pass
             self.modes = [ModeDict(mode) for mode in self.modes]
             camel = re.compile('[a-z]+')
@@ -62,4 +44,5 @@ class SurvivrData:
                                 f"{'_'.join([camel.match(key).group(0), *map(str.lower, match)])}",
                                 mode[key])
 
-        return self._json
+    def _raise_error_json_is_none(self):
+        raise UserDoesNotExist(f'User {self._username!r} does not exist!')
