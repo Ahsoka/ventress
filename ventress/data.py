@@ -1,9 +1,6 @@
 import re
-import aiohttp
 
 from .utils import JSONToClass
-
-class UserDoesNotExist(Exception): pass
 
 class SurvivrData(JSONToClass):
     url = 'https://surviv.io/api/user_stats'
@@ -25,9 +22,17 @@ class SurvivrData(JSONToClass):
         }
 
     async def _setattrs(self):
-        await super()._setattrs()
+        self._json = await self._get_json()
+        if self._json is None:
+            return
+
+        decimal = re.compile(r'\d+\.\d+')
+        for key in self._json:
+            if decimal.fullmatch(str(self._json[key])):
+                setattr(self, key, float(self._json[key]))
+            else:
+                setattr(self, key, self._json[key])
         if hasattr(self, 'modes') and len(self.modes) >= 1:
-            decimal = re.compile(r'\d+\.\d+')
             class ModeDict(dict): pass
             self.modes = [ModeDict(mode) for mode in self.modes]
             camel = re.compile('[a-z]+')
@@ -43,6 +48,3 @@ class SurvivrData(JSONToClass):
                         setattr(mode,
                                 f"{'_'.join([camel.match(key).group(0), *map(str.lower, match)])}",
                                 mode[key])
-
-    def _raise_error_json_is_none(self):
-        raise UserDoesNotExist(f'User {self._username!r} does not exist!')
