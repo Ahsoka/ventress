@@ -22,6 +22,40 @@ class SurvivrData(JSONToClass):
             'mapIdFilter': self.gamemode
         }
 
+    @staticmethod
+    def convert_to_gamemode(mode_as_str: str):
+        # TODO: Add typo detection (possibly using Levenshtein distance)
+        if isinstance(mode_as_str, (int, float)):
+            return int(mode_as_str)
+        mode_as_str = mode_as_str.lower()
+        game_modes = {
+            -1: 'All modes',
+            0: 'Normal',
+            1: 'Desert',
+            2: 'Woods',
+            3: '50v50',
+            4: 'Potato',
+            5: 'Savannah',
+            6: 'Halloween',
+            7: 'Cobalt',
+            8: 'Snow',
+            9: 'Valentine',
+            10: 'Saint Patrick',
+            11: 'Eggsplosion',
+            13: 'May 4th',
+            14: '50v50 Last Sacrifice',
+            15: 'Storm',
+            16: 'Beach',
+            17: 'Contact',
+            18: 'Inferno'
+        }
+        for num, mode in game_modes.items():
+            mode = mode.lower()
+            if mode_as_str in mode:
+                return num
+        
+
+    
     async def _setattrs(self):
         self._json = await self._get_json()
         if self._json is None:
