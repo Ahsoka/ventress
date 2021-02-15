@@ -16,9 +16,9 @@ class JSONToClass:
 
     async def _get_json(self):
         async with aiohttp.ClientSession() as session:
-            async with session.post(self.url,
+            async with session.post(type(self).url,
                                     json=self.payload,
                                     params=self.params if hasattr(self, 'params') else {}) as request:
                 self._request = request
                 return await request.json()
-        
+       
