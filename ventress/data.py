@@ -13,6 +13,7 @@ class SurvivrData(JSONToClass):
         if interval not in self.valid_intevals:
             raise ValueError(f'{interval!r} is not a valid interval')
         self.interval = interval
+        gamemode = self.convert_to_gamemode(gamemode)
         if gamemode not in self.valid_gamemodes:
             raise ValueError(f'{gamemode!r} is not a valid gamemode option.')
         self.gamemode = gamemode
