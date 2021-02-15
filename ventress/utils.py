@@ -10,7 +10,7 @@ class JSONToClass:
 
     async def _async_init(self):
         await self._setattrs()
-        if self._json is None:
+        if not self._json:
             return None
         return self
 
