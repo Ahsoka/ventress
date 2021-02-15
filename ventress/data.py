@@ -1,6 +1,7 @@
 import re
 
 from .utils import JSONToClass
+from urllib.parse import urlencode
 from dateutil.parser import isoparse
 
 class SurvivrData(JSONToClass):
@@ -12,16 +13,23 @@ class SurvivrData(JSONToClass):
         self.slug = slug.lower()
         if interval not in self.valid_intevals:
             raise ValueError(f'{interval!r} is not a valid interval')
+        
+        if interval == 'all':
+            interval = 'alltime'
         self.interval = interval
+        
         gamemode = self.convert_to_gamemode(gamemode)
         if gamemode not in self.valid_gamemodes:
             raise ValueError(f'{gamemode!r} is not a valid gamemode option.')
         self.gamemode = gamemode
+
         self.payload = {
             'slug': self.slug,
             'interval': self.interval,
             'mapIdFilter': self.gamemode
         }
+    
+        self.url = f"https://surviv.io/stats/{self.slug}?{urlencode({'t': self.interval, 'mapId': gamemode})}"
 
     @staticmethod
     def convert_to_gamemode(mode_as_str: str):
