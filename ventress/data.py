@@ -30,6 +30,15 @@ class SurvivrData(JSONToClass):
         }
     
         self.url = f"https://surviv.io/stats/{self.slug}?{urlencode({'t': self.interval, 'mapId': gamemode})}"
+    
+    @property
+    def how_recent(self):
+        intervals = {
+            'alltime': 'All Games',
+            'weekly': 'Games in the Last Week',
+            'daily': 'Games in the Last Day'
+        }
+        return intervals[self.interval]
 
     @staticmethod
     def convert_to_gamemode(mode_as_str: str):
