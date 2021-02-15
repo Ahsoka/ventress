@@ -8,8 +8,8 @@ class SurvivrData(JSONToClass):
     valid_intevals = ['all', 'alltime', 'weekly', 'daily']
     valid_gamemodes = range(-1, 19)
 
-    def __init__(self, username, interval='all', gamemode=-1):
-        self._username = username
+    def __init__(self, slug, interval='all', gamemode=-1):
+        self.slug = slug.lower()
         if interval not in self.valid_intevals:
             raise ValueError(f'{interval!r} is not a valid interval')
         self.interval = interval
@@ -17,7 +17,7 @@ class SurvivrData(JSONToClass):
             raise ValueError(f'{gamemode!r} is not a valid gamemode option.')
         self.gamemode = gamemode
         self.payload = {
-            'slug': self._username.lower(),
+            'slug': self.slug,
             'interval': self.interval,
             'mapIdFilter': self.gamemode
         }
