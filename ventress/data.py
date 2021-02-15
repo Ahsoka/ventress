@@ -4,6 +4,28 @@ from .utils import JSONToClass
 from urllib.parse import urlencode
 from dateutil.parser import isoparse
 
+game_modes = {
+    -1: 'All modes',
+    0: 'Normal',
+    1: 'Desert',
+    2: 'Woods',
+    3: '50v50',
+    4: 'Potato',
+    5: 'Savannah',
+    6: 'Halloween',
+    7: 'Cobalt',
+    8: 'Snow',
+    9: 'Valentine',
+    10: 'Saint Patrick',
+    11: 'Eggsplosion',
+    13: 'May 4th',
+    14: '50v50 Last Sacrifice',
+    15: 'Storm',
+    16: 'Beach',
+    17: 'Contact',
+    18: 'Inferno'
+}
+
 class SurvivrData(JSONToClass):
     url = 'https://surviv.io/api/user_stats'
     valid_intevals = ['all', 'alltime', 'weekly', 'daily']
@@ -18,18 +40,18 @@ class SurvivrData(JSONToClass):
             interval = 'alltime'
         self.interval = interval
         
-        gamemode = self.convert_to_gamemode(gamemode)
-        if gamemode not in self.valid_gamemodes:
-            raise ValueError(f'{gamemode!r} is not a valid gamemode option.')
-        self.gamemode = gamemode
+        self.encoded_gamemode = self.convert_to_gamemode(gamemode)
+        if self.encoded_gamemode not in self.valid_gamemodes:
+            raise ValueError(f'{self.encoded_gamemode!r} is not a valid gamemode option.')
+        self.gamemode = self.encoded_to_gamemode(self.encoded_gamemode)
 
         self.payload = {
             'slug': self.slug,
             'interval': self.interval,
-            'mapIdFilter': self.gamemode
+            'mapIdFilter': self.encoded_gamemode
         }
     
-        self.url = f"https://surviv.io/stats/{self.slug}?{urlencode({'t': self.interval, 'mapId': gamemode})}"
+        self.url = f"https://surviv.io/stats/{self.slug}?{urlencode({'t': self.interval, 'mapId': self.encoded_gamemode})}"
     
     @property
     def how_recent(self):
@@ -46,33 +68,14 @@ class SurvivrData(JSONToClass):
         if isinstance(mode_as_str, (int, float)):
             return int(mode_as_str)
         mode_as_str = mode_as_str.lower()
-        game_modes = {
-            -1: 'All modes',
-            0: 'Normal',
-            1: 'Desert',
-            2: 'Woods',
-            3: '50v50',
-            4: 'Potato',
-            5: 'Savannah',
-            6: 'Halloween',
-            7: 'Cobalt',
-            8: 'Snow',
-            9: 'Valentine',
-            10: 'Saint Patrick',
-            11: 'Eggsplosion',
-            13: 'May 4th',
-            14: '50v50 Last Sacrifice',
-            15: 'Storm',
-            16: 'Beach',
-            17: 'Contact',
-            18: 'Inferno'
-        }
         for num, mode in game_modes.items():
             mode = mode.lower()
             if mode_as_str in mode:
                 return num
-        
 
+    @staticmethod
+    def encoded_to_gamemode(encoded):
+        return None if encoded == -1 else game_modes[encoded]
     
     async def _setattrs(self):
         self._json = await self._get_json()
