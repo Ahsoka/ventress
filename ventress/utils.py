@@ -21,4 +21,9 @@ class JSONToClass:
                                     params=self.params if hasattr(self, 'params') else {}) as request:
                 self._request = request
                 return await request.json()
-       
+
+def code_block(string, lang='', ending_line=True):
+    if lang is None:
+        lang = ''
+    # NOTE: char(10) is '\n'
+    return f"```{lang}\n{string}{char(10) if ending_line else ''}```"
