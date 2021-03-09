@@ -107,10 +107,14 @@ class SurvivrData(JSONToClass):
 
     def overall_win_percentage(self, precision=2, hundred=True):
         return round(self.wins / self.games * 100, precision) if hundred else round(self.wins / self.games, precision)
-    
+
     @property
     def embed_overall_stats(self):
-        return code_block(f"GAMES: {self.games}\tWINS: {self.wins}\tKPG: {self.kpg}\tKILLS: {self.kills}", lang='py')
+        upper_portion = f"Wins: {self.wins}\tGames: {self.games}\tWin Percentage: {self.overall_win_percentage()}%"
+        lower_portion = f"Kills: {self.kills}"
+        lower_portion += ' ' * (len(upper_portion[:upper_portion.find('\t', upper_portion.find('\t') + 1) + 1].replace('\t', ' ' * 4)) - len(lower_portion)) \
+                         + f'Kills Per Game (KPG): {self.kpg}'
+        return code_block(f"{upper_portion}\n{lower_portion}", lang='py')
 
 class UserMatchHistory(JSONToClass):
     url = 'https://surviv.io/api/match_history'
