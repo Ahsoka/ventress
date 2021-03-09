@@ -1,8 +1,8 @@
 import re
 
-from .utils import JSONToClass
 from urllib.parse import urlencode
 from dateutil.parser import isoparse
+from .utils import JSONToClass, code_block
 
 game_modes = {
     -1: 'All modes',
@@ -104,6 +104,11 @@ class SurvivrData(JSONToClass):
                         setattr(mode,
                                 f"{'_'.join([camel.match(key).group(0), *map(str.lower, match)])}",
                                 mode[key])
+
+    @property
+    def embed_overall_stats(self):
+        return code_block(f"GAMES: {self.games}\tWINS: {self.wins}\tKPG: {self.kpg}\tKILLS: {self.kills}", lang='py')
+        
 
 class UserMatchHistory(JSONToClass):
     url = 'https://surviv.io/api/match_history'
