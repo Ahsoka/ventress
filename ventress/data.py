@@ -105,10 +105,12 @@ class SurvivrData(JSONToClass):
                                 f"{'_'.join([camel.match(key).group(0), *map(str.lower, match)])}",
                                 mode[key])
 
+    def overall_win_percentage(self, precision=2, hundred=True):
+        return round(self.wins / self.games * 100, precision) if hundred else round(self.wins / self.games, precision)
+    
     @property
     def embed_overall_stats(self):
         return code_block(f"GAMES: {self.games}\tWINS: {self.wins}\tKPG: {self.kpg}\tKILLS: {self.kills}", lang='py')
-        
 
 class UserMatchHistory(JSONToClass):
     url = 'https://surviv.io/api/match_history'
