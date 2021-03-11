@@ -26,6 +26,41 @@ game_modes = {
     18: 'Inferno'
 }
 
+class Gamemode(str):
+    def __new__(cls, gamemode, *args, **kwargs):
+        if gamemode == -1:
+            return None
+        else:
+            try:
+                if isinstance(gamemode, (int, float)):
+                    return super().__new__(cls, game_modes[int(gamemode)])
+            except KeyError as error:
+                raise ValueError(f'{gamemode} is not a valid gamemode option. '
+                                  "Possible options are -1 to 11 and 13 to 18.") from error
+            return super().__new__(cls, gamemode)
+
+    def __init__(self, gamemode):
+        self.encoded = gamemode
+        self.proper = game_modes[self.encoded]
+    
+    def _set_encoded(self, value):
+        if isinstance(value, (int, float)):
+            self._encoded = int(value)
+        elif isinstance(value, str):
+            for num, mode in game_modes.items():
+                if value.lower() in mode.lower():
+                    self._encoded = num
+                    break
+            else:
+                raise ValueError(f'{value!r} is not a valid gamemode option. See data.game_modes to see the valid options.')
+        else:
+            raise TypeError(f"gamemode must be a string or number, not a '{type(value)}'")
+    
+    def _get_encoded(self):
+        return self._encoded
+    
+    encoded = property(_get_encoded, _set_encoded)
+
 class SurvivrData(JSONToClass):
     url = 'https://surviv.io/api/user_stats'
     valid_intevals = ['all', 'alltime', 'weekly', 'daily']
