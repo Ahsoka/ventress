@@ -75,15 +75,12 @@ class SurvivrData(JSONToClass):
             interval = 'alltime'
         self.interval = interval
         
-        self.encoded_gamemode = self.convert_to_gamemode(gamemode)
-        if self.encoded_gamemode not in self.valid_gamemodes:
-            raise ValueError(f'{self.encoded_gamemode!r} is not a valid gamemode option.')
-        self.gamemode = self.encoded_to_gamemode(self.encoded_gamemode)
+        self.gamemode = Gamemode(gamemode)
 
         self.payload = {
             'slug': self.slug,
             'interval': self.interval,
-            'mapIdFilter': self.encoded_gamemode
+            'mapIdFilter': self.gamemode.encoded
         }
     
         self.url = f"https://surviv.io/stats/{self.slug}?{urlencode({'t': self.interval, 'mapId': self.encoded_gamemode})}"
@@ -96,21 +93,6 @@ class SurvivrData(JSONToClass):
             'daily': 'Games in the Last Day'
         }
         return intervals[self.interval]
-
-    @staticmethod
-    def convert_to_gamemode(mode_as_str: str):
-        # TODO: Add typo detection (possibly using Levenshtein distance)
-        if isinstance(mode_as_str, (int, float)):
-            return int(mode_as_str)
-        mode_as_str = mode_as_str.lower()
-        for num, mode in game_modes.items():
-            mode = mode.lower()
-            if mode_as_str in mode:
-                return num
-
-    @staticmethod
-    def encoded_to_gamemode(encoded):
-        return None if encoded == -1 else game_modes[encoded]
     
     async def _setattrs(self):
         self._json = await self._get_json()
