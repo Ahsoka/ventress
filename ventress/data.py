@@ -80,7 +80,7 @@ class SurvivrData(JSONToClass):
         self.payload = {
             'slug': self.slug,
             'interval': self.interval,
-            'mapIdFilter': self.gamemode.encoded
+            'mapIdFilter': self.gamemode.encoded if self.gamemode else -1
         }
 
         self.url = self._instance_url()
