@@ -28,7 +28,7 @@ game_modes = {
 
 class Gamemode(str):
     def __new__(cls, gamemode, *args, **kwargs):
-        if gamemode == -1:
+        if gamemode == -1 or isinstance(gamemode, str) and 'all' in gamemode:
             return None
         else:
             try:
