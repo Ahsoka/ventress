@@ -141,15 +141,21 @@ class SurvivrData(JSONToClass):
     
     @property 
     def embed(self):
-        upper_portion = f"Wins: {self.wins}\tGames: {self.games}\tWin Percentage: {self.overall_win_percentage()}%"
-        lower_portion = f"Kills: {self.kills}"
-        lower_portion += ' ' * (len(upper_portion[:upper_portion.find('\t', upper_portion.find('\t') + 1) + 1].replace('\t', ' ' * 4)) - len(lower_portion)) \
-                         + f'Kills Per Game (KPG): {self.kpg}'
+        if len(self.modes) == 3:
+            upper_portion = f"Wins: {self.wins}\tGames: {self.games}\tWin Percentage: {self.overall_win_percentage()}%"
+            lower_portion = f"Kills: {self.kills}"
+            lower_portion += ' ' * (len(upper_portion[:upper_portion.find('\t', upper_portion.find('\t') + 1) + 1].replace('\t', ' ' * 4)) - len(lower_portion)) \
+                            + f'Kills Per Game (KPG): {self.kpg}'
+            description = code_block(f"{upper_portion}\n{lower_portion}", lang='py')
+        else:
+            description = code_block('\n'.join([f'{data.capitalize()}: {getattr(self, data)}' for data in ['kills', 'games', 'wins']]
+                                               + [f"Win Percentage: {self.overall_win_percentage()}%", f'Kills Per Game (KPG): {self.kpg}']),
+                                     lang='py')
 
         embed = discord.Embed(title=f"{self.username} | {self.how_recent}" \
                                     + (f' | {self.gamemode.proper}' if self.gamemode else ''),
                               url=self.url,
-                              description=code_block(f"{upper_portion}\n{lower_portion}", lang='py'))
+                              description=description)
 
         emojis = [
             '<:solos:818919273107423246>',
