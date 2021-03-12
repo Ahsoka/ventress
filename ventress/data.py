@@ -1,3 +1,4 @@
+import discord
 import re
 
 from urllib.parse import urlencode
@@ -145,6 +146,32 @@ class SurvivrData(JSONToClass):
         lower_portion += ' ' * (len(upper_portion[:upper_portion.find('\t', upper_portion.find('\t') + 1) + 1].replace('\t', ' ' * 4)) - len(lower_portion)) \
                          + f'Kills Per Game (KPG): {self.kpg}'
         return code_block(f"{upper_portion}\n{lower_portion}", lang='py')
+    
+    @property 
+    def embed(self):
+        embed = discord.Embed(title=f"{self.username} | {self.how_recent}" \
+                                    + (f' | {self.gamemode.proper}' if self.gamemode else ''),
+                              url=self.url,
+                              description=self.embed_overall_stats)
+
+        emojis = [
+            '<:solos:818919273107423246>',
+            '<:duos:819680418806104084>',
+            '<:squads:819680854342762496>'
+        ]
+
+        for emoji, mode in zip(emojis, self.modes):
+            embed.add_field(name=f'{emoji} {mode.type}',
+                            value=(f"**Games**: `{mode.games}`\n"
+                                   f"**Wins**: `{mode.wins}`\n"
+                                   f"**Win Percent**: `{mode.win_pct}%`\n"
+                                   f"**Max Kills**: `{mode.most_kills}`\n"
+                                   f"**Max Damage**: `{mode.most_damage}`\n"
+                                   f"**KPG**: `{mode.kpg}`\n"
+                                   f"**Avg Damage**: `{mode.avg_damage}`\n"
+                                   f"**Avg Time Alive**: `{mode.avg_time_alive} sec`"))
+        
+        return embed
 
 class UserMatchHistory(JSONToClass):
     url = 'https://surviv.io/api/match_history'
