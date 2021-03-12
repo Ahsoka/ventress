@@ -128,6 +128,13 @@ class SurvivrData(JSONToClass):
                                 f"{'_'.join([camel.match(key).group(0), *map(str.lower, match)])}",
                                 mode[key])
 
+                if mode.team_mode == 1:
+                    mode.type = 'Solos'
+                elif mode.team_mode == 2:
+                    mode.type = 'Duos'
+                elif mode.team_mode == 4:
+                    mode.type = 'Squads'
+
     def overall_win_percentage(self, precision=2, hundred=True):
         return round(self.wins / self.games * 100, precision) if hundred else round(self.wins / self.games, precision)
 
