@@ -82,9 +82,15 @@ class SurvivrData(JSONToClass):
             'interval': self.interval,
             'mapIdFilter': self.gamemode.encoded
         }
+
+        self.url = self._instance_url()
     
-        self.url = f"https://surviv.io/stats/{self.slug}?{urlencode({'t': self.interval, 'mapId': self.encoded_gamemode})}"
-    
+    def _instance_url(self):
+        if self.gamemode:
+            return f"https://surviv.io/stats/{self.slug}?{urlencode({'t': self.interval, 'mapId': self.gamemode.encoded})}"
+        else:
+            return f"https://surviv.io/stats/{self.slug}?{urlencode({'t': self.interval})}"
+
     @property
     def how_recent(self):
         intervals = {
